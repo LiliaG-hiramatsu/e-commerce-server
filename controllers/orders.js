@@ -48,13 +48,27 @@ export async function createOrder(req, res) {
     await saveOrders(orders);
 
     res.status(201).json({
-      orderId,
       message: "Orden guardada correctamente",
+      orderId: orderToSave.id,
       order: orderToSave,
     });
   } catch (err) {
     console.error("Error al crear la orden:", err);
     res.status(500).json({ message: "Error interno al guardar la orden" });
+  }
+}
+
+// obtener una orden
+export async function getOrderById(req, res) {
+  try {
+    const orders = await readOrders();
+    const id = req.params.id;
+    const order = orders.find(o => String(o.id) === String(id) || String(o.orderId) === String(id));
+    if (!order) return res.status(404).json({ message: "Orden no encontrada" });
+    res.json(order);
+  } catch (err) {
+    console.error("Error getOrderById:", err);
+    res.status(500).json({ message: "Error interno" });
   }
 }
 
